@@ -62,10 +62,15 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+h1 = sigmoid([ones(m, 1) X] * Theta1');
+h2 = sigmoid([ones(m, 1) h1] * Theta2');
 
 
-
-
+% y mapped to classes.
+Y = zeros(m, num_labels)';
+Y((0:num_labels:m*num_labels-1)+y')=ones(1,m);
+Y = Y';
+J = sum(sum(-Y .* log(h2) - (1-Y) .* log(1-h2), 2)) / m;
 
 
 
