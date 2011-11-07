@@ -71,8 +71,8 @@ Y = zeros(m, num_labels)';
 Y((0:num_labels:m*num_labels-1)+y')=ones(1,m);
 Y = Y';
 J = sum(sum(-Y .* log(h2) - (1-Y) .* log(1-h2), 2)) / m;
-
-
+regularizing = lambda * (sum(sum(Theta1(:,2:end).^2,2)) + sum(sum(Theta2(:,2:end).^2,2))) / (2 * m);
+J = J + regularizing;
 
 
 
