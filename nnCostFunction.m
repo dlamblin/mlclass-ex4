@@ -62,19 +62,34 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-h1 = sigmoid([ones(m, 1) X] * Theta1');
-h2 = sigmoid([ones(m, 1) h1] * Theta2');
-
+% Forward Propegation, a2 a3 = layer activations for each m; z2 z3 = layer triggers for each m
+a2 = [ones(m, 1) X] * Theta1';
+z2 = sigmoid(a2);
+a3 = [ones(m, 1) z2] * Theta2';
+h = z3 = sigmoid(a2);
 
 % y mapped to classes.
-Y = zeros(m, num_labels)';
-Y((0:num_labels:m*num_labels-1)+y')=ones(1,m);
+Y = zeros(num_labels, m);
+Y(( 0 : num_labels : m * num_labels - 1 ) + y') = ones(1, m);
 Y = Y';
-J = sum(sum(-Y .* log(h2) - (1-Y) .* log(1-h2), 2)) / m;
+
+% Cost regularized
+J = sum(sum(-Y .* log(h) - (1-Y) .* log(1-h), 2)) / m;
 regularizing = lambda * (sum(sum(Theta1(:,2:end).^2,2)) + sum(sum(Theta2(:,2:end).^2,2))) / (2 * m);
 J = J + regularizing;
 
+% Backwards propagation [backin up]
+delta_3 = h - Y;
+%delta_2 = Theta2' * delta_3 .* sigmoidGradient(z2);
+delta_2 = delta_3 * Theta2 .* sigmoidGradient(z2);
+Delta_2 = delta_3(:, 2:end) * a2';
+Delta_1 = delta_2(:, 2:end) * X';
 
+for t=1:m,
+% 1) forward propagate
+% 2) back(3) = layer(3) - y
+% 3) arg read it again
+end
 
 
 
