@@ -63,10 +63,10 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 % Forward Propegation, a2 a3 = layer activations for each m; z2 z3 = layer triggers for each m
-a2 = [ones(m, 1) X] * Theta1';
-z2 = sigmoid(a2);
-a3 = [ones(m, 1) z2] * Theta2';
-h = z3 = sigmoid(a2);
+z2 = [ones(m, 1) X] * Theta1';
+a2 = [ones(m, 1) sigmoid(z2)];
+z3 = a2 * Theta2';
+h = a3 = sigmoid(z3);
 
 % y mapped to classes.
 Y = zeros(num_labels, m);
@@ -80,16 +80,28 @@ J = J + regularizing;
 
 % Backwards propagation [backin up]
 delta_3 = h - Y;
-%delta_2 = Theta2' * delta_3 .* sigmoidGradient(z2);
-delta_2 = delta_3 * Theta2 .* sigmoidGradient(z2);
-Delta_2 = delta_3(:, 2:end) * a2';
-Delta_1 = delta_2(:, 2:end) * X';
+delta_2 = delta_3 * Theta2 .* sigmoidGradient([ones(m, 1) z2]);
 
-for t=1:m,
+Delta_1 = zeros(size(Theta1));
+Delta_2 = zeros(size(Theta2));
+
+% Accumulate deltas
+for t = 1:m,
+ Delta_2 += delta_3(t,:)' * a2(t,:);
+ Delta_1 += delta_2(t, 2:end)' * [1 X(t,:)];
+end;
+
+% Regularize gradients
+Theta1_grad = Delta_1./m;
+Theta2_grad = Delta_2./m;
+Theta1_grad += lambda / m * [zeros(size(Theta1, 1), 1) Theta1(:,2:end)];
+Theta2_grad += lambda / m * [zeros(size(Theta2, 1), 1) Theta2(:,2:end)];
+
+%for t=1:m,
 % 1) forward propagate
 % 2) back(3) = layer(3) - y
 % 3) arg read it again
-end
+%end
 
 
 
